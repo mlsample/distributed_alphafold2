@@ -191,15 +191,15 @@ def check_existing_dirs(fasta_file_dir, alpha_out_dir, force_overwrite):
                     has_fasta_dir_name_in_dir = any([fasta_name == file for file in os.listdir(dir_path)])
                     bug_user_bool = not is_dir_empty and has_fasta_dir_name_in_dir
                 
-                if bug_user_bool:
-                    user_input = input(f"Directory '{dir_path}' already exists. Do you want to proceed? (y/n/skip_this_fasta): ")
-                    if user_input.lower() == 'n':
-                        raise Exception("Process terminated by user.")
-                    elif user_input.lower() == 'skip_this_fasta':
-                        print(f"Skipping fasta file '{fasta_name}'.")
-                        continue
-                    else:
-                        print(f"Proceeding with fasta file '{fasta_name}'.")
+                    if bug_user_bool:
+                        user_input = input(f"Directory '{dir_path}' already exists. Do you want to proceed? (y/n/skip_this_fasta): ")
+                        if user_input.lower() == 'n':
+                            raise Exception("Process terminated by user.")
+                        elif user_input.lower() == 'skip_this_fasta':
+                            print(f"Skipping fasta file '{fasta_name}'.")
+                            continue
+                        else:
+                            print(f"Proceeding with fasta file '{fasta_name}'.")
 
 if __name__ == "__main__":
     main()
