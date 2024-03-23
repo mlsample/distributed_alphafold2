@@ -180,8 +180,8 @@ def check_existing_dirs(fasta_file_dir, alpha_out_dir, force_overwrite):
         return None
     else:
         for file_name in os.listdir(fasta_file_dir):
-                if file_name.endswith('.fasta'):
-                    fasta_name = os.path.splitext(file_name)[0]
+            if file_name.endswith('.fasta'):
+                fasta_name = os.path.splitext(file_name)[0]
                 dir_path = os.path.join(alpha_out_dir, fasta_name)
                 
                 if os.path.exists(dir_path):
