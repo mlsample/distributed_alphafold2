@@ -1,13 +1,6 @@
 #temp
 fasta_files
 sif_file
-alphafold_output
-alphafold_output_dir
-slurm_out_files
-HMMER
-alphapickle
-cache_file
-batch_script
 my_etc
 alphafold_out_dir
 .vscode
