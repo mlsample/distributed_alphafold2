@@ -4,3 +4,5 @@ sif_file
 my_etc
 alphafold_out_dir
 .vscode
+save_alpha_fold_files_here
+/fatcat_tmalign

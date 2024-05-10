@@ -31,3 +31,39 @@ options:
                         Path to the run script EX: ./run.sh
   --force_overwrite     Force overwrite of existing results if they exist to rerun AlphaFold2 for all fasta files.
 ```
+
+To use the strucutre homology search script type first download FATCAT and TMalign (USalign) using:
+```bash
+chmod +x download_fatcat_tm_align.sh
+bash download_fatcat_tm_align.sh
+```
+
+And then run:
+```bash
+python3 fatcat_tmalign_proteome_search.py --query_file_dir ../query_pbs --proteome_dirs ../proteomes --fatcat_install_dir ./fatcat_tmalign/FATCAT-dist --tm_align_install_dir ./fatcat_tmalign/USalign
+```
+
+For additional help, use:
+
+```bash
+python3 fatcat_tmalign_proteome_search.py -h
+```
+to return the parser help output:
+
+```plaintext
+usage: fatcat_tmalign_proteome_search.py [-h] [-q query_file_dir] [-p proteome_dirs] [-f fatcat_install_dir] [-t tm_align_install_dir] [--force_overwrite]
+
+FATCAT and TM-Align Strucutral Homology Screens
+
+options:
+  -h, --help            show this help message and exit
+  -q query_file_dir, --query_file_dir query_file_dir
+                        Directory containing the query PDB files EX: ./query_dir/
+  -p proteome_dirs, --proteome_dirs proteome_dirs
+                        Directory of proteome directories EX: ./proteomes/ (where ./proteomes contains multiple dirs called i.e human, mouse, drome)
+  -f fatcat_install_dir, --fatcat_install_dir fatcat_install_dir
+                        Path to the fatcat github directory EX: ./FATCAT-dist/
+  -t tm_align_install_dir, --tm_align_install_dir tm_align_install_dir
+                        Path to the USAlign github directory EX: ./USalign
+  --force_overwrite     Force overwrite of existing results if they exist to rerun AlphaFold2 for all fasta files.
+  ```
