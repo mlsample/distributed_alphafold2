@@ -4,5 +4,7 @@ sif_file
 my_etc
 alphafold_out_dir
 .vscode
-save_alpha_fold_files_here
+alphafold_out_dir_all_fasta
 /fatcat_tmalign
+homology_search_example
+junior_request
