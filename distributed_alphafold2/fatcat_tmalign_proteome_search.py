@@ -146,11 +146,17 @@ def handle_overwrite(force_overwrite, output_name):
 def run_fatcat_search(query_pdb, proteome_dir, fatcat_install_dir):
     start_dir = os.getcwd()
     prot_db_path = make_proteome_database_file(proteome_dir)
+
     
     fatcat_search_path = fatcat_install_dir / 'FATCATMain' / 'FATCATSearch.pl'
     
     os.chdir(proteome_dir)
-    shutil.copyfile(query_pdb, proteome_dir / query_pdb.name)
+    
+    if os.path.exists(proteome_dir / query_pdb.name):
+        place_query_in_proteome_dir = False
+    else:
+        place_query_in_proteome_dir = True
+        shutil.copyfile(query_pdb, proteome_dir / query_pdb.name)
     
     invocation = [
         str(fatcat_search_path),
@@ -167,9 +173,11 @@ def run_fatcat_search(query_pdb, proteome_dir, fatcat_install_dir):
         print(f"An error occurred while running FATCAT search: {e.stderr.decode()}")
         raise
     
-    os.remove(proteome_dir / query_pdb.name)
-        
+    if place_query_in_proteome_dir:
+        os.remove(proteome_dir / query_pdb.name)
+    
     aln_info = parse_fatcat_file(result_file)
+    
     
     os.chdir(start_dir)
     return aln_info
@@ -182,7 +190,11 @@ def run_tm_align_search(query_pdb, proteome_dir, tm_align_install_dir):
     tm_align_path = tm_align_install_dir / 'USalign'
     
     os.chdir(proteome_dir)
-    shutil.copyfile(query_pdb, proteome_dir / query_pdb.name)
+    if os.path.exists(proteome_dir / query_pdb.name):
+        place_query_in_proteome_dir = False
+    else:
+        place_query_in_proteome_dir = True
+        shutil.copyfile(query_pdb, proteome_dir / query_pdb.name)
     
     invocation = [
         str(tm_align_path),
@@ -202,7 +214,8 @@ def run_tm_align_search(query_pdb, proteome_dir, tm_align_install_dir):
         print(f"An error occurred while running TM-Align search: {e.stderr.decode()}")
         raise
     
-    os.remove(proteome_dir / query_pdb.name)
+    if place_query_in_proteome_dir:
+        os.remove(proteome_dir / query_pdb.name)
     
     aln_info = parse_tmalign_file(result_file)
     
@@ -293,17 +306,18 @@ def search_multiple_proteomes(query_pdb, proteome_dirs, fatcat_install_dir, tm_a
     proteomes_fatcat = {proteome_dir.name:[] for proteome_dir in proteome_dirs}
     proteomes_tm_align = {proteome_dir.name:[] for proteome_dir in proteome_dirs}
     
-    args = [(query_pdb, proteome_dir, fatcat_install_dir, tm_align_install_dir) for proteome_dir in proteome_dirs]
-    with ProcessPoolExecutor() as executor:
-        results = list(executor.map(run_fatcat_tmalign_parallel, args))
+    # args = [(query_pdb, proteome_dir, fatcat_install_dir, tm_align_install_dir) for proteome_dir in proteome_dirs]
+    # with ProcessPoolExecutor() as executor:
+    #     results = list(executor.map(run_fatcat_tmalign_parallel, args))
         
-    for proteome_dir, (fatcat_result, tm_align_result) in zip(proteome_dirs, results):
-        proteomes_fatcat[proteome_dir.name] = fatcat_result
-        proteomes_tm_align[proteome_dir.name] = tm_align_result
-        
-    # for proteome_dir in proteome_dirs:
-    #     proteomes_fatcat[proteome_dir.name] = run_fatcat_search(query_pdb, proteome_dir, fatcat_install_dir)
-    #     proteomes_tm_align[proteome_dir.name] = run_tm_align_search(query_pdb, proteome_dir, tm_align_install_dir)
+    # for proteome_dir, (fatcat_result, tm_align_result) in zip(proteome_dirs, results):
+    #     proteomes_fatcat[proteome_dir.name] = fatcat_result
+    #     proteomes_tm_align[proteome_dir.name] = tm_align_result
+    
+    
+    for proteome_dir in proteome_dirs:
+        proteomes_fatcat[proteome_dir.name] = run_fatcat_search(query_pdb, proteome_dir, fatcat_install_dir)
+        proteomes_tm_align[proteome_dir.name] = run_tm_align_search(query_pdb, proteome_dir, tm_align_install_dir)
     
     dfs1 = []
     for key, df in proteomes_fatcat.items():
@@ -330,16 +344,17 @@ def search_multiple_queries(query_file_dir, proteome_dirs, fatcat_install_dir, t
     query_pdbs = [query_file_dir / query_pdb for query_pdb in query_file_dir.glob("*.pdb") if query_pdb.is_file()]
     queries = {query_pdb.name:[] for query_pdb in query_pdbs}
     
-    args = [(query_pdb, proteome_dirs, fatcat_install_dir, tm_align_install_dir) for query_pdb in query_pdbs]
     
-    with ProcessPoolExecutor() as executor:
-        results = list(tqdm(executor.map(search_multiple_proteomes_parallel, args), total=len(args), desc='Progress searching all queries...'))
+    # args = [(query_pdb, proteome_dirs, fatcat_install_dir, tm_align_install_dir) for query_pdb in query_pdbs]
     
-    for query_pdb, result in zip(query_pdbs, results):
-        queries[query_pdb.name] = result
+    # with ProcessPoolExecutor() as executor:
+    #     results = list(tqdm(executor.map(search_multiple_proteomes_parallel, args), total=len(args), desc='Progress searching all queries...'))
     
-    # for query_pdb in query_pdbs:
-    #     queries[query_pdb.name] = search_multiple_proteomes(query_pdb, proteome_dirs, fatcat_install_dir, tm_align_install_dir)
+    # for query_pdb, result in zip(query_pdbs, results):
+    #     queries[query_pdb.name] = result
+    
+    for query_pdb in tqdm(query_pdbs, total=len(query_pdbs), desc='Progress searching all queries...'):
+        queries[query_pdb.name] = search_multiple_proteomes(query_pdb, proteome_dirs, fatcat_install_dir, tm_align_install_dir)
     
     dfs = []
     for key, df in queries.items():    
