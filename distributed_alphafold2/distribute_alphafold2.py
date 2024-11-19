@@ -98,8 +98,9 @@ def distribute_alphafold_to_all_fasta_files(fasta_file_dir: str, alpha_out_dir: 
 
 def launch_batch_jobs(fasta_file_dir, alpha_out_dir):
     for file_name in os.listdir(fasta_file_dir):
-        if file_name.endswith('.fasta'):
+        if (file_name.endswith('.fasta')) or (file_name.endswith('.fa')):
             fasta_name = os.path.splitext(file_name)[0]
+            fasta_name = fasta_name.replace('(','').replace(')','')
             dir_path = os.path.join(alpha_out_dir, fasta_name)
             run_script = f'run_{fasta_name}.sh'
             os.chdir(dir_path)
@@ -124,21 +125,26 @@ def build_each_fasta_a_run(fasta_file_dir: str, alpha_out_dir: str, current_dire
 def make_directories(fasta_file_dir, alpha_out_dir):
     
     for file_name in os.listdir(fasta_file_dir):
-        if file_name.endswith('.fasta'):
+        if (file_name.endswith('.fasta')) or (file_name.endswith('.fa')):
             fasta_name = os.path.splitext(file_name)[0]
+            fasta_name = fasta_name.replace('(','').replace(')','')
             dir_path = os.path.join(alpha_out_dir, fasta_name)
             os.makedirs(dir_path, exist_ok=True)
     return None
     
 def copy_fasta_files(fasta_file_dir, alpha_out_dir):
     for file_name in os.listdir(fasta_file_dir):
-        if file_name.endswith('.fasta'):
+        if (file_name.endswith('.fasta')) or (file_name.endswith('.fa')):
+            
             fasta_path = os.path.join(fasta_file_dir, file_name)
+            
             fasta_name = os.path.splitext(file_name)[0]
+            fasta_name = fasta_name.replace('(','').replace(')','')
             dir_path = os.path.join(alpha_out_dir, fasta_name)
+            
             save_path = os.path.join(dir_path, f'{fasta_name}.fasta')
             if not os.path.exists(save_path):
-                shutil.copy(fasta_path, dir_path)
+                shutil.copy(fasta_path, save_path)
     return None
 
 
@@ -153,10 +159,12 @@ def generate_run_scripts(fasta_file_dir, alpha_out_dir, current_directory, sif_f
     
     
     for file_name in os.listdir(fasta_file_dir):
-        if file_name.endswith('.fasta'):
+        if (file_name.endswith('.fasta')) or (file_name.endswith('.fa')):
             
             # Modify the run script for each fasta file
+            
             fasta_name = os.path.splitext(file_name)[0]
+            fasta_name = fasta_name.replace('(','').replace(')','')
             run_script_content_modified_1 = run_script_content_modified_0.replace('my_fasta_file_VAR', file_name)
             
             # Modify where alphafold results will be saved
@@ -180,8 +188,9 @@ def check_existing_dirs(fasta_file_dir, alpha_out_dir, force_overwrite):
         return None
     else:
         for file_name in os.listdir(fasta_file_dir):
-            if file_name.endswith('.fasta'):
+            if (file_name.endswith('.fasta')) or (file_name.endswith('.fa')):
                 fasta_name = os.path.splitext(file_name)[0]
+                fasta_name.replace('(','').replace(')','')
                 dir_path = os.path.join(alpha_out_dir, fasta_name)
                 
                 if os.path.exists(dir_path):

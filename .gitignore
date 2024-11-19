@@ -8,3 +8,5 @@ alphafold_out_dir_all_fasta
 /fatcat_tmalign
 homology_search_example
 junior_request
+AllProteins
+ReferenceProteins
